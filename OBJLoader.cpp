@@ -375,6 +375,7 @@ namespace OBJFile {
 		}
 	}
 	void OBJLoader::loadMtlFile(const char* iPath, std::vector<mtlMaterial>& iVector) {
+		bool clear = false;
 		std::ifstream mtlFile(iPath, std::ios_base::binary);
 		if (mtlFile.is_open()) {
 			std::string currentLine;
@@ -428,9 +429,14 @@ namespace OBJFile {
 				{
 					std::string vecString = currentLine.substr(6, currentLine.size());
 					sscanf_s(vecString.c_str(), "%f\n", &newMat.illum);
-					iVector.push_back(newMat);
 				}
 					break;
+				}
+				if (currentLine == "") {
+					if (clear) {
+						iVector.push_back(newMat);
+					}
+					clear = true;
 				}
 			}
 
