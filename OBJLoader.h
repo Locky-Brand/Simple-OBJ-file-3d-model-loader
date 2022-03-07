@@ -72,6 +72,17 @@ namespace OBJFile {
 		int norm;
 	};
 
+	struct mtlMaterial {
+		fileVec3 ka;
+		fileVec3 kd;
+		fileVec3 ks;
+		float ns;
+		float d;
+		float tr; // = 1 - d
+		float ni;
+		float illum;
+	};
+
 	struct loadInfo {
 		enum dataLayout {
 			ERROR,
@@ -93,6 +104,9 @@ namespace OBJFile {
 
 		// writes data to a vector and returns its format
 		loadInfo load(const char* iPath, std::vector<float>& iVector);
+
+		// extract materials from mtl file
+		void loadMtlFile(const char* iPath, std::vector<mtlMaterial>& iVector);
 	};
 }
 #endif

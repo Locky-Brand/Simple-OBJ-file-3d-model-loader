@@ -374,4 +374,70 @@ namespace OBJFile {
 			return { loadInfo::dataLayout::ERROR, 0 };
 		}
 	}
+	void OBJLoader::loadMtlFile(const char* iPath, std::vector<mtlMaterial>& iVector) {
+		std::ifstream mtlFile(iPath, std::ios_base::binary);
+		if (mtlFile.is_open()) {
+			std::string currentLine;
+			while (!mtlFile.eof()) {
+				std::getline(mtlFile, currentLine);
+
+				mtlMaterial newMat;
+				
+				std::string prop = currentLine.substr(0, 2);
+				switch (prop[0]) {
+				case 'K':
+				{
+					std::string vecString = currentLine.substr(3, currentLine.size());
+					fileVec3 vecs;
+					sscanf_s(vecString.c_str(), "%f %f %f\n", &vecs.x, &vecs.y, &vecs.z);
+					switch (prop[1]) {
+					case 'a':
+						newMat.ka = vecs;
+						break;
+					case 'd':
+						newMat.kd = vecs;
+						break;
+					case 's':
+						newMat.ks = vecs;
+						break;
+					}
+				}
+					break;
+				case 'N':
+				{
+					std::string vecString = currentLine.substr(3, currentLine.size());
+					float num;
+					sscanf_s(vecString.c_str(), "%f\n", &num);
+					switch (prop[1]) {
+					case 's':
+						newMat.ns = num;
+						break;
+					case 'i':
+						newMat.ni = num;
+						break;
+					}
+					break;
+				}
+				case 'd':
+				{
+					std::string vecString = currentLine.substr(2, currentLine.size());
+					sscanf_s(vecString.c_str(), "%f\n", &newMat.d);
+				}
+					break;
+				case 'i':
+				{
+					std::string vecString = currentLine.substr(6, currentLine.size());
+					sscanf_s(vecString.c_str(), "%f\n", &newMat.illum);
+					iVector.push_back(newMat);
+				}
+					break;
+				}
+			}
+
+			mtlFile.close();
+		}
+		else {
+			std::cout << "error: mtlFile not found" << '\n';
+		}
+	}
 }
