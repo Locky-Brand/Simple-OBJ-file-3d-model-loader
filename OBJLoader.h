@@ -8,6 +8,12 @@
 #include <stdio.h>
 #include <algorithm>
 
+#if defined(WIN32)
+#define SSCANF sscanf_s
+#elif defined(__linux__) || defined(__APPLE__)
+#define SSCANF sscanf
+#endif
+
 namespace OBJFile {
 	struct fileVec2 {
 		float x;
@@ -83,14 +89,16 @@ namespace OBJFile {
 		float illum;
 	};
 
+	enum dataLayout {
+		ERROR,
+		POS,
+		POS_TEX,
+		POS_NORM,
+		POS_TEX_NORM
+	};
+
 	struct loadInfo {
-		enum dataLayout {
-			ERROR,
-			POS,
-			POS_TEX,
-			POS_NORM,
-			POS_TEX_NORM
-		} layout;
+		dataLayout layout;
 		unsigned long long floatsWritten;
 	};
 
@@ -104,6 +112,7 @@ namespace OBJFile {
 
 		// writes data to a vector and returns its format
 		loadInfo load(const char* iPath, std::vector<float>& iVector);
+		loadInfo load(const char* iPath, std::vector<float>& iVector, dataLayout iDesiredLayout);
 
 		// extract materials from mtl file
 		void loadMtlFile(const char* iPath, std::vector<mtlMaterial>& iVector);
